@@ -1,0 +1,6 @@
+﻿services:
+  artsy.backend:
+    image: artsy.backend
+    build:
+      context: .
+      dockerfile: Dockerfile
