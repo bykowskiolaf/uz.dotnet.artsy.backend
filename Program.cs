@@ -16,8 +16,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseNpgsql(connectionString));
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>(); // Register the default password hasher
 
 var app = builder.Build();
 
