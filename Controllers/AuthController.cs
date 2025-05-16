@@ -1,9 +1,9 @@
 using artsy.backend.Dtos.Auth;
-using Artsy.Backend.Dtos.Auth;
-using artsy.backend.Services;
+using artsy.backend.Dtos.Auth;
+using artsy.backend.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Artsy.Backend.Controllers;
+namespace artsy.backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -57,7 +57,7 @@ public class AuthController : ControllerBase
 			SameSite = SameSiteMode.Strict,
 		};
 		
-		Response.Cookies.Append("", tokenResponse.Token, cookieOptions);
+		Response.Cookies.Append("session", tokenResponse.Token, cookieOptions);
 		return Ok(tokenResponse);
 	}
 }

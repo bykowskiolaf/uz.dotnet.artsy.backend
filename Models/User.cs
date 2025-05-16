@@ -19,6 +19,12 @@ public class User
 	[Required]
 	public string PasswordHash { get; set; } = string.Empty;
 
+	[MaxLength(200)]
+	public string? FullName { get; set; }
+
+	[MaxLength(1000)]
+	public string? Bio { get; set; }
+
 	public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 	public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

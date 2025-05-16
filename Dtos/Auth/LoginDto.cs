@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Artsy.Backend.Dtos.Auth;
+namespace artsy.backend.Dtos.Auth;
 
 public class LoginDto
 {

@@ -3,34 +3,28 @@ using System.Security.Claims;
 using System.Text;
 using artsy.backend.Data;
 using artsy.backend.Dtos.Auth;
-using Artsy.Backend.Dtos.Auth;
-using artsy.backend.Models;
 using Microsoft.EntityFrameworkCore;
-using artsy.backend.Services;
 using Microsoft.IdentityModel.Tokens;
-
-
-namespace Artsy.Backend.Services;
-
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
+
+namespace artsy.backend.Services.Auth;
 
 public class AuthService : IAuthService
 {
 	private readonly ApplicationDbContext _context;
-	private readonly IPasswordHasher<User> _passwordHasher;
+	private readonly IPasswordHasher<Models.User> _passwordHasher;
 	private readonly IConfiguration _configuration;
 	
 	public AuthService(
 		ApplicationDbContext context,
-		IPasswordHasher<User> passwordHasher,
+		IPasswordHasher<Models.User> passwordHasher,
 		IConfiguration configuration)
 	{
 		_context = context;
 		_passwordHasher = passwordHasher;
 		_configuration = configuration;
 	}
-	public async Task<User?> RegisterAsync(RegisterDto registerDto)
+	public async Task<Models.User?> RegisterAsync(RegisterDto registerDto)
 	{
 		// Check if username or email already exists
 		if (await _context.Users.AnyAsync(u => u.Username == registerDto.Username))
@@ -45,7 +39,7 @@ public class AuthService : IAuthService
 			return null;
 		}
 
-		var user = new User
+		var user = new Models.User
 		{
 			Username = registerDto.Username,
 			Email = registerDto.Email,

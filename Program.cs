@@ -1,8 +1,8 @@
 using System.Text;
 using artsy.backend.Data;
 using artsy.backend.Models;
-using artsy.backend.Services;
-using Artsy.Backend.Services;
+using artsy.backend.Services.Auth;
+using artsy.backend.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +25,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddAuthentication(options =>
 	{
@@ -61,6 +62,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
