@@ -7,6 +7,7 @@
     restart: always
     environment:
       - ConnectionStrings__DefaultConnection="Host=$PG_HOST;Port=5432;Username=$PG_USERNAME;Password=$PG_PASSWORD;Database=$PG_DATABASE"
+      - Jwt__Key=$JWT_KEY
 
   db:
     image: postgres

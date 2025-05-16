@@ -1,4 +1,5 @@
 using artsy.backend.Dtos.Auth;
+using Artsy.Backend.Dtos.Auth;
 using artsy.backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,5 +32,32 @@ public class AuthController : ControllerBase
 		}
 
 		return Ok(new { message = "User registered. Try logging in.", userId = user.Id });
+	}
+	
+	[HttpPost("login")]
+	public async Task<IActionResult> Login(LoginDto loginDto)
+	{
+		if (!ModelState.IsValid)
+		{
+			return BadRequest(ModelState);
+		}
+
+		var tokenResponse = await _authService.LoginAsync(loginDto);
+
+		if (tokenResponse == null)
+		{
+			return Unauthorized(new { message = "Invalid credentials." });
+		}
+
+		var cookieOptions = new CookieOptions
+		{
+			HttpOnly = true,
+			Expires = tokenResponse.Expiration,
+			Secure = true,
+			SameSite = SameSiteMode.Strict,
+		};
+		
+		Response.Cookies.Append("", tokenResponse.Token, cookieOptions);
+		return Ok(tokenResponse);
 	}
 }
