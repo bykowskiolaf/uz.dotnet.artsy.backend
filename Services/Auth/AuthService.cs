@@ -195,7 +195,7 @@ public class AuthService : IAuthService
 		             ?? throw new InvalidOperationException("JWT Issuer is not configured.");
 		var audience = _configuration["Jwt:Audience"]
 		               ?? throw new InvalidOperationException("JWT Audience is not configured.");
-		var duration = Convert.ToDouble(_configuration["Jwt:DurationInHours"] ?? "1");
+		var duration = Convert.ToDouble(_configuration["Jwt:DurationInMinutes"] ?? "15");
 
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
@@ -206,7 +206,7 @@ public class AuthService : IAuthService
 				new Claim(ClaimTypes.Email, user.Email),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 			}),
-			Expires = DateTime.UtcNow.AddHours(duration),
+			Expires = DateTime.UtcNow.AddMinutes(duration),
 			Issuer = issuer,
 			Audience = audience,
 			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
