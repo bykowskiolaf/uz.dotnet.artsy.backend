@@ -27,4 +27,6 @@ public class User
 
 	public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 	public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+	public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

@@ -1,5 +1,6 @@
 using System.Text;
 using artsy.backend.Data;
+using artsy.backend.Middlewares;
 using artsy.backend.Models;
 using artsy.backend.Services.Auth;
 using artsy.backend.Services.User;
@@ -27,26 +28,39 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddAuthentication(options =>
 	{
 		options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 		options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-		options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 	})
 	.AddJwtBearer(options =>
 	{
-		options.SaveToken = true; // Optionally save the token in the HttpContext
-		options.RequireHttpsMetadata = builder.Environment.IsProduction(); // Enforce HTTPS in production
-		options.TokenValidationParameters = new TokenValidationParameters()
+		options.RequireHttpsMetadata = builder.Configuration.GetValue<bool>("CookieSettings:Secure", !builder.Environment.IsDevelopment());
+
+		options.TokenValidationParameters = new TokenValidationParameters
 		{
 			ValidateIssuer = true,
 			ValidateAudience = true,
-			ValidateLifetime = true, // Check token expiration
+			ValidateLifetime = true,
 			ValidateIssuerSigningKey = true,
 			ValidIssuer = builder.Configuration["Jwt:Issuer"],
 			ValidAudience = builder.Configuration["Jwt:Audience"],
-			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]
-			                                                                   ?? throw new InvalidOperationException("JWT Key is not configured in Program.cs")))
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+		};
+
+		options.Events = new JwtBearerEvents
+		{
+			OnMessageReceived = context =>
+			{
+				if (context.Request.Cookies.TryGetValue("x-access-token", out var accessTokenFromCookie))
+				{
+					context.Token = accessTokenFromCookie;
+				}
+
+				return Task.CompletedTask;
+			}
 		};
 	});
 
@@ -54,7 +68,8 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseMiddleware<ErrorHandlerMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
 	app.MapOpenApi();

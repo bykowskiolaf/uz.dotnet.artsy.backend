@@ -12,8 +12,8 @@ using artsy.backend.Data;
 namespace artsy.backend.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250516082639_AddProfileFieldsToUser")]
-    partial class AddProfileFieldsToUser
+    [Migration("20250516103849_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,28 +25,45 @@ namespace artsy.backend.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Artsy.Backend.Models.FavoriteArtwork", b =>
+            modelBuilder.Entity("artsy.backend.Models.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ArtsyArtworkId")
-                        .HasMaxLength(100)
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("DateAdded")
+                    b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByIp")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReplacedByToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Revoked")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RevokedByIp")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId", "ArtsyArtworkId")
+                    b.HasIndex("Token")
                         .IsUnique();
 
-                    b.ToTable("FavoriteArtworks");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("artsy.backend.Models.User", b =>
@@ -94,15 +111,20 @@ namespace artsy.backend.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Artsy.Backend.Models.FavoriteArtwork", b =>
+            modelBuilder.Entity("artsy.backend.Models.RefreshToken", b =>
                 {
                     b.HasOne("artsy.backend.Models.User", "User")
-                        .WithMany()
+                        .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("artsy.backend.Models.User", b =>
+                {
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }
