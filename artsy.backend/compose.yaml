@@ -1,0 +1,31 @@
+﻿services:
+  artsy.backend:
+    image: artsy.backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - ConnectionStrings__DefaultConnection="Host=$PG_HOST;Port=5432;Username=$PG_USERNAME;Password=$PG_PASSWORD;Database=$PG_DATABASE"
+      - Jwt__Key=$JWT_KEY
+
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: $PG_PASSWORD
+      POSTGRES_DB: $PG_DATABASE
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+      
+volumes:
+  pgdata:
+    driver: local
