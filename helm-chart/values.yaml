@@ -1,0 +1,59 @@
+namespace: artsy
+
+replicaCount: 1
+
+image:
+  repository: bykowskiolaf/artsy-backend
+  tag: latest
+  pullPolicy: Always
+
+service:
+  name: backend
+  port: 8080
+
+ingress:
+  enabled: true
+  className: traefik
+  hostname: artsy.bykowski.dev
+  tls:
+    enabled: true
+    secretName: artsy-bykowski-dev-tls
+    clusterIssuer: cloudflare-cluster-issuer
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector:
+  "kubernetes.io/hostname": "armvm"
+
+jwt:
+  issuer: "https://artsy.bykowski.dev"
+  audience: "https://artsy.bykowski.dev"
+  durationInMinutes: "15"
+  refreshTokenTTLDays: "7"
+
+# Cookie Settings (for ConfigMap)
+cookieSettings:
+  secure: "true" # Should be "true" for HTTPS environments
+  sameSiteAccessToken: "Strict" # "Strict", "Lax", or "None" (None requires Secure=true)
+  pathAccessToken: "/api"
+  sameSiteRefreshToken: "Strict"
+  pathRefreshToken: "/api/auth/refresh"
+
+tolerations: [ ]
+
+affinity: { }
+
+postgresql:
+  database: artsy
+  host: artsy-backend-postgresql.artsy.svc.cluster.local
+  port: 5432
+  global:
+    postgresql:
+      auth:
+        existingSecret: artsy-postgresql-secret
