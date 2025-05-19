@@ -20,20 +20,11 @@ var username = Environment.GetEnvironmentVariable("PG_USERNAME");
 var password = Environment.GetEnvironmentVariable("PG_PASSWORD");
 var database = Environment.GetEnvironmentVariable("PG_DATABASE");
 
-Console.WriteLine("Host:" + host);
-Console.WriteLine("Port:" + port);
-Console.WriteLine("Username:" + username);
-Console.WriteLine("Password:" + password);
-Console.WriteLine("Database:" + database);
-Console.WriteLine("Default connection string: " + connectionString);
-
 if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(database))
 	connectionString = $"Host={host};Port={port};Username={username};Password={password};Database={database}";
 
 if (string.IsNullOrEmpty(connectionString))
 	throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-Console.WriteLine($"DEBUG: Final Connection String being used: '{connectionString}'"); // Add quotes to see leading/trailing spaces
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseNpgsql(connectionString));
