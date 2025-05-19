@@ -42,6 +42,9 @@ services:
       - PG_USERNAME=${PG_USERNAME}
       - PG_PASSWORD=${PG_PASSWORD}
       - PG_DATABASE=${PG_DATABASE}
+        
+      - ArtsyApiSettings__ClientId=${ARTSY_CLIENT_ID}
+      - ArtsyApiSettings__ClientSecret=${ARTSY_CLIENT_SECRET}
 
       # JWT Configuration from .env
       - Jwt__Key=${JWT_KEY}

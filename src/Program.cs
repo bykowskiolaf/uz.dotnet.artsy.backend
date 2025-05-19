@@ -3,6 +3,7 @@ using artsy.backend.Data;
 using artsy.backend.Middlewares;
 using artsy.backend.Models;
 using artsy.backend.Services.Auth;
+using artsy.backend.Services.ExternalApis.Artsy;
 using artsy.backend.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -12,13 +13,13 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = "";
 
-var host = Environment.GetEnvironmentVariable("PG_HOST");
-var port = Environment.GetEnvironmentVariable("PG_PORT") ?? "5432";
-var username = Environment.GetEnvironmentVariable("PG_USERNAME");
-var password = Environment.GetEnvironmentVariable("PG_PASSWORD");
-var database = Environment.GetEnvironmentVariable("PG_DATABASE");
+var host = builder.Configuration["Database:Host"];
+var port = builder.Configuration["Database:Port"] ?? "5432";
+var database = builder.Configuration["Database:Name"];
+var username = builder.Configuration["Database:Username"];
+var password = builder.Configuration["Database:Password"];
 
 if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(database))
 	connectionString = $"Host={host};Port={port};Username={username};Password={password};Database={database}";
@@ -38,8 +39,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IArtsyApiService, ArtsyApiService>();
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(options =>
 	{
@@ -72,6 +75,11 @@ builder.Services.AddAuthentication(options =>
 			}
 		};
 	});
+
+builder.Services.AddHttpClient("ArtsyApiClient", client =>
+{
+	client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+});
 
 builder.Services.AddAuthorization();
 
