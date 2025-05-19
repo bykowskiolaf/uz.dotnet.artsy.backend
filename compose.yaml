@@ -1,31 +1,67 @@
-﻿services:
-  artsy.backend:
-    image: artsy.backend
+﻿version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: artsy_db_container
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PG_USERNAME}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - artsy_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $PG_USERNAME -d $PG_DATABASE"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  artsy-app:
+    container_name: artsy_app_container
     build:
       context: .
       dockerfile: Dockerfile
-    restart: always
-    environment:
-      - ConnectionStrings__DefaultConnection="Host=$PG_HOST;Port=5432;Username=$PG_USERNAME;Password=$PG_PASSWORD;Database=$PG_DATABASE"
-      - Jwt__Key=$JWT_KEY
-
-  db:
-    image: postgres
-    restart: always
-    shm_size: 128mb
+    restart: unless-stopped
     ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+      - "5127:8080"
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      POSTGRES_PASSWORD: $PG_PASSWORD
-      POSTGRES_DB: $PG_DATABASE
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
-      interval: 1s
-      timeout: 5s
-      retries: 10
-      
+      # ASP.NET Core Settings from .env
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+      # Database connection parameters for your C# code (from .env)
+      - PG_HOST=${PG_HOST_FOR_APP}
+      - PG_PORT=${PG_PORT_FOR_APP}
+      - PG_USERNAME=${PG_USERNAME}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - PG_DATABASE=${PG_DATABASE}
+
+      # JWT Configuration from .env
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+
+      - Jwt__DurationInHours=${JWT_DURATIONINHOURS:-1} # Default if not in .env
+      - Jwt__RefreshTokenTTLDays=${JWT_REFRESHTOKENTTLDAYS:-7} # Default if not in .env
+
+      - CookieSettings__Secure=${COOKIESETTINGS_SECURE}
+      - CookieSettings__SameSiteAccessToken=${COOKIESETTINGS_SAMESITEACCESSTOKEN}
+      - CookieSettings__PathAccessToken=${COOKIESETTINGS_PATHACCESSTOKEN}
+      - CookieSettings__SameSiteRefreshToken=${COOKIESETTINGS_SAMESITEREFRESHTOKEN}
+      - CookieSettings__PathRefreshToken=${COOKIESETTINGS_PATHREFRESHTOKEN}
+    networks:
+      - artsy_network
+
 volumes:
   pgdata:
-    driver: local
+
+networks:
+  artsy_network:
+    driver: bridge

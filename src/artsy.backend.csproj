@@ -24,4 +24,12 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="net9.0\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="net9.0\appsettings.json" />
+      <_ContentIncludedByDefault Remove="net9.0\artsy.backend.deps.json" />
+      <_ContentIncludedByDefault Remove="net9.0\artsy.backend.runtimeconfig.json" />
+      <_ContentIncludedByDefault Remove="net9.0\artsy.backend.staticwebassets.endpoints.json" />
+    </ItemGroup>
+
 </Project>

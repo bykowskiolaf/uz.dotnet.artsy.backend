@@ -3,7 +3,7 @@ using artsy.backend.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Artsy.Backend.Controllers;
+namespace artsy.backend.Controllers;
 
 [Authorize]
 [Route("api/[controller]")]
@@ -46,6 +46,5 @@ public class ProfileController : ControllerBase
 		}
 
 		return Ok(new { message = "Profile updated successfully." });
-		// Or return NoContent() (HTTP 204) for successful updates without a body
 	}
 }
