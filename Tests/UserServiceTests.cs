@@ -65,7 +65,27 @@ public class UserServiceTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Username, Is.EqualTo("testuser"));  // Add more specific assertions
+        Assert.That(result.Username, Is.EqualTo("testuser")); 
         Assert.That(result.Email, Is.EqualTo("test@example.com"));
     }
+    
+    [Test]
+public async Task GetUserProfileAsync_ReturnsNull_WhenUserDoesNotExist()
+{
+    // Arrange
+    var nonExistentUserId = Guid.NewGuid();
+    var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, nonExistentUserId.ToString())
+    };
+    var claimsIdentity = new ClaimsIdentity(claims);
+    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+    // Act
+    var result = await _userService.GetUserProfileAsync(claimsPrincipal);
+
+    // Assert
+    Assert.That(result, Is.Null);
+}
+
 }
