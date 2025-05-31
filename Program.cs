@@ -5,6 +5,7 @@ using artsy.backend.Models;
 using artsy.backend.Services.Auth;
 using artsy.backend.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,9 +13,18 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString)) {
+
+var host = Environment.GetEnvironmentVariable("PG_HOST");
+var port = Environment.GetEnvironmentVariable("PG_PORT") ?? "5432";
+var username = Environment.GetEnvironmentVariable("PG_USERNAME");
+var password = Environment.GetEnvironmentVariable("PG_PASSWORD");
+var database = Environment.GetEnvironmentVariable("PG_DATABASE");
+
+if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(database))
+	connectionString = $"Host={host};Port={port};Username={username};Password={password};Database={database}";
+
+if (string.IsNullOrEmpty(connectionString))
 	throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseNpgsql(connectionString));
@@ -22,6 +32,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -37,7 +48,7 @@ builder.Services.AddAuthentication(options =>
 	})
 	.AddJwtBearer(options =>
 	{
-		options.RequireHttpsMetadata = builder.Configuration.GetValue<bool>("CookieSettings:Secure", !builder.Environment.IsDevelopment());
+		options.RequireHttpsMetadata = builder.Configuration.GetValue("CookieSettings:Secure", !builder.Environment.IsDevelopment());
 
 		options.TokenValidationParameters = new TokenValidationParameters
 		{
@@ -55,9 +66,7 @@ builder.Services.AddAuthentication(options =>
 			OnMessageReceived = context =>
 			{
 				if (context.Request.Cookies.TryGetValue("x-access-token", out var accessTokenFromCookie))
-				{
 					context.Token = accessTokenFromCookie;
-				}
 
 				return Task.CompletedTask;
 			}
@@ -70,12 +79,26 @@ var app = builder.Build();
 
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
+using (var scope = app.Services.CreateScope())
+{
+	var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+	if (dbContext.Database.IsRelational())
+		dbContext.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
 	app.MapOpenApi();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+	ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
