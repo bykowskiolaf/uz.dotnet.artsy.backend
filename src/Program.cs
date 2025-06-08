@@ -1,7 +1,9 @@
+using System.Net.Http.Headers;
 using System.Text;
 using artsy.backend.Data;
 using artsy.backend.Middlewares;
 using artsy.backend.Models;
+using artsy.backend.Services.Aggregation;
 using artsy.backend.Services.Auth;
 using artsy.backend.Services.ExternalApis.Artsy;
 using artsy.backend.Services.User;
@@ -40,6 +42,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IArtsyApiService, ArtsyApiService>();
+builder.Services.AddScoped<IArtistAggregationService, ArtistAggregationService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
@@ -76,10 +79,7 @@ builder.Services.AddAuthentication(options =>
 		};
 	});
 
-builder.Services.AddHttpClient("ArtsyApiClient", client =>
-{
-	client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-});
+builder.Services.AddHttpClient("ArtsyApiClient", client => { client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json")); });
 
 builder.Services.AddAuthorization();
 
