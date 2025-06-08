@@ -1,14 +1,15 @@
 using System.Net;
 using System.Text.Json;
+using artsy.backend.exceptions;
 using artsy.backend.Exceptions;
 
 namespace artsy.backend.Middlewares;
 
 public class ErrorHandlerMiddleware
 {
-	private readonly IHostEnvironment _env;
-	private readonly ILogger<ErrorHandlerMiddleware> _logger;
-	private readonly RequestDelegate _next;
+	readonly IHostEnvironment _env;
+	readonly ILogger<ErrorHandlerMiddleware> _logger;
+	readonly RequestDelegate _next;
 
 	public ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> logger, IHostEnvironment env)
 	{
@@ -47,18 +48,23 @@ public class ErrorHandlerMiddleware
 					response.StatusCode = (int)HttpStatusCode.Unauthorized;
 
 					break;
+				case ExternalApiException e: // External API errors
+					_logger.LogWarning("External API '{ServiceName}' failed with status {StatusCode}: {Message}", e.ServiceName, e.StatusCode, e.Message);
+					response.StatusCode = (int)HttpStatusCode.InternalServerError;
+					errorResponse = new { message = $"There was a problem communicating with an external art service ({e.ServiceName}). Please try again later.", traceId = context.TraceIdentifier };
+
+					break;
 				case AppException e: // Catch-all
 					response.StatusCode = (int)HttpStatusCode.BadRequest;
 
 					break;
-				default: // Unhandled errors
+				default:
 					_logger.LogError(error, "An unhandled error occurred: {ErrorMessage}", error.Message);
 					response.StatusCode = (int)HttpStatusCode.InternalServerError;
-					// For unhandled errors, don't expose error.Message directly in production if it might contain sensitive info
 					errorResponse = new
 					{
-						message = (_env.IsDevelopment() || _env.EnvironmentName == "Local") ? error.Message : "An unexpected error occurred. Please try again later.",
-						traceId = context.TraceIdentifier,
+						message = _env.IsDevelopment() || _env.EnvironmentName == "Local" ? error.Message : "An unexpected error occurred. Please try again later.",
+						traceId = context.TraceIdentifier
 					};
 
 					break;

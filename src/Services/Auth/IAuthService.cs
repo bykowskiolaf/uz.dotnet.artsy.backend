@@ -3,7 +3,6 @@ using artsy.backend.Dtos.Auth;
 
 namespace artsy.backend.Services.Auth;
 
-// ...
 public interface IAuthService
 {
 	Task<Models.User> RegisterAsync(RegisterDto registerDto);
@@ -11,4 +10,3 @@ public interface IAuthService
 	Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto refreshTokenRequestDto);
 	Task<bool> LogoutAsync(ClaimsPrincipal userPrincipal, string? refreshTokenValue);
 }
-// ...

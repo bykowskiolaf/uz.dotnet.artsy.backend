@@ -39,7 +39,7 @@ public class ArtistsController : ControllerBase
 		return Ok(artists);
 	}
 
-	[HttpGet] // GET /api/artists
+	[HttpGet]
 	public async Task<IActionResult> GetArtists([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
 	{
 		if (page < 1 || pageSize < 1 || pageSize > 100)

@@ -43,8 +43,18 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IArtsyApiService, ArtsyApiService>();
 builder.Services.AddScoped<IArtistAggregationService, ArtistAggregationService>();
+builder.Services.AddScoped<IArtworkAggregationService, ArtworkAggregationService>();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.Configure<ArtsyApiSettings>(builder.Configuration.GetSection(ArtsyApiSettings.SectionName));
+builder.Services.Configure<ArtsyApiSettings>(options =>
+{
+	options.ClientId ??= builder.Configuration["ARTSY_CLIENT_ID"];
+	options.ClientSecret ??= builder.Configuration["ARTSY_CLIENT_SECRET"];
+});
+
+
 builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(options =>
