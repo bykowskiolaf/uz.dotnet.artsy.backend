@@ -6,3 +6,4 @@ riderModule.iml
 /_ReSharper.Caches/
 /.env
 /artsy.backend.sln.DotSettings.user
+src/appsettings.local.json 

@@ -7,9 +7,9 @@ metadata:
   namespace: {{ .Release.Namespace }} # Use .Release.Namespace for the deployed namespace
 data:
   # PostgreSQL Connection (non-sensitive parts)
-  PG_HOST: {{ .Values.postgresql.host | quote }}
-  PG_PORT: {{ .Values.postgresql.port | default "5432" | quote }}
-  PG_DATABASE: {{ .Values.postgresql.database | quote }}
+  Database__Host: {{ .Values.postgresql.host | quote }}
+  Database__Port: {{ .Values.postgresql.port | default "5432" | quote }}
+  Database__Name: {{ .Values.postgresql.database | quote }}
 
   Jwt__Issuer: {{ .Values.jwt.issuer | quote }}
   Jwt__Audience: {{ .Values.jwt.audience | quote }}
