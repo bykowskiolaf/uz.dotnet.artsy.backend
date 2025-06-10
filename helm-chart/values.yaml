@@ -57,3 +57,7 @@ postgresql:
     postgresql:
       auth:
         existingSecret: artsy-postgresql-secret
+        
+artsyApiSettings:
+  baseUrl: "https://api.artsy.net/api"
+  tokenUrl: "https://api.artsy.net/api/tokens/xapp_token"

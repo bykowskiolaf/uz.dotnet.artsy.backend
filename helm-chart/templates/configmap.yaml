@@ -21,3 +21,6 @@ data:
   CookieSettings__PathAccessToken: {{ .Values.cookieSettings.pathAccessToken | default "/api" | quote }}
   CookieSettings__SameSiteRefreshToken: {{ .Values.cookieSettings.sameSiteRefreshToken | default "Strict" | quote }}
   CookieSettings__PathRefreshToken: {{ .Values.cookieSettings.pathRefreshToken | default "/api/auth/refresh" | quote }}
+
+  ArtsyApiSettings__BaseUrl: {{ .Values.artsyApiSettings.baseUrl | quote }}
+  ArtsyApiSettings__TokenUrl: {{ .Values.artsyApiSettings.tokenUrl | quote }}
