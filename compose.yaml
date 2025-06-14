@@ -16,7 +16,7 @@ services:
     networks:
       - artsy_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $PG_USERNAME -d $PG_DATABASE"]
+      test: [ "CMD-SHELL", "pg_isready -U $PG_USERNAME -d $PG_DATABASE" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -37,12 +37,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
 
       # Database connection parameters for your C# code (from .env)
-      - PG_HOST=${PG_HOST_FOR_APP}
-      - PG_PORT=${PG_PORT_FOR_APP}
-      - PG_USERNAME=${PG_USERNAME}
-      - PG_PASSWORD=${PG_PASSWORD}
-      - PG_DATABASE=${PG_DATABASE}
-        
+      - Database__Host=${PG_HOST_FOR_APP}
+      - Database__Port=${PG_PORT_FOR_APP}
+      - Database__Username=${PG_USERNAME}
+      - Database__Password=${PG_PASSWORD}
+      - Database__Name=${PG_DATABASE}
+
       - ArtsyApiSettings__ClientId=${ARTSY_CLIENT_ID}
       - ArtsyApiSettings__ClientSecret=${ARTSY_CLIENT_SECRET}
 
