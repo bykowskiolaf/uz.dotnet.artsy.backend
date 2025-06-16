@@ -16,6 +16,12 @@ public class UserService : IUserService
     private bool TryGetUserId(ClaimsPrincipal userPrincipal, out Guid userId)
     {
         userId = Guid.Empty;
+
+        if (userPrincipal == null)
+        {
+            return false;
+        }
+
         var userIdString = userPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
         return !string.IsNullOrEmpty(userIdString) && Guid.TryParse(userIdString, out userId);
     }
@@ -56,11 +62,11 @@ public class UserService : IUserService
             return false;
         }
 
-        if (updateProfileDto.FullName != null || user.FullName != updateProfileDto.FullName)
+        if (updateProfileDto.FullName != null && user.FullName != updateProfileDto.FullName) // Zmienione na && zamiast ||
         {
              user.FullName = updateProfileDto.FullName;
         }
-        if (updateProfileDto.Bio != null || user.Bio != updateProfileDto.Bio)
+        if (updateProfileDto.Bio != null && user.Bio != updateProfileDto.Bio) // Zmienione na && zamiast ||
         {
             user.Bio = updateProfileDto.Bio;
         }
