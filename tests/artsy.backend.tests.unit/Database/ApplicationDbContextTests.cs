@@ -1,10 +1,6 @@
-﻿using NUnit.Framework;
-using Microsoft.EntityFrameworkCore;
-using artsy.backend.Data; // Upewnij się, że to jest poprawna ścieżka do Twojego DbContext
-using artsy.backend.Models; // Upewnij się, że to jest poprawna ścieżka do Twoich modeli User i RefreshToken
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using artsy.backend.Data; 
+using artsy.backend.Models;
 
 namespace artsy.backend.tests.unit.Data
 {
@@ -16,14 +12,10 @@ namespace artsy.backend.tests.unit.Data
         [SetUp]
         public void Setup()
         {
-            // Konfiguracja in-memory bazy danych.
-            // Użycie unikalnej nazwy bazy danych dla każdego testu zapewnia izolację testów.
             _options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
         }
-
-        // --- Testowanie DbSet'ów i podstawowych operacji CRUD dla User ---
 
         [Test]
         public async Task UsersDbSet_CanAddAndRetrieveUserWithNewFields()
@@ -165,7 +157,7 @@ namespace artsy.backend.tests.unit.Data
                 Assert.That(revokedToken, Is.Not.Null);
                 Assert.That(revokedToken.Revoked, Is.Not.Null);
                 Assert.That(revokedToken.RevokedByIp, Is.EqualTo("10.0.0.1"));
-                Assert.That(revokedToken.IsActive, Is.False); // Sprawdź właściwość obliczeniową
+                Assert.That(revokedToken.IsActive, Is.False);
             }
         }
     }

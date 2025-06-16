@@ -21,15 +21,15 @@ public class UserServiceTests
     [SetUp]
     public void Setup()
     {
-        // Konfiguracja in-memory bazy danych dla każdego testu
+        
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Użyj unikalnej nazwy dla każdego testu
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) 
             .Options;
 
         _context = new ApplicationDbContext(options);
         _userService = new UserService(_context);
 
-        // Dodaj przykładowego użytkownika do bazy danych przed każdym testem
+        
         _testUserId = Guid.NewGuid();
         var testUser = new User
         {
@@ -44,7 +44,7 @@ public class UserServiceTests
         _context.Users.Add(testUser);
         _context.SaveChanges();
 
-        // Stwórz ClaimsPrincipal dla testowego użytkownika
+        
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, _testUserId.ToString()),
@@ -57,7 +57,6 @@ public class UserServiceTests
     [TearDown]
     public void Teardown()
     {
-        // Wyczyść in-memory bazę danych po każdym teście
         _context.Database.EnsureDeleted();
         _context.Dispose();
     }
