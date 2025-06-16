@@ -5,7 +5,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		compose.yaml = compose.yaml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{6B8848A1-6C0B-41FB-A8E6-FFEDDE82D73F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Tests.csproj", "{6B8848A1-6C0B-41FB-A8E6-FFEDDE82D73F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "artsy.backend", "artsy.backend\artsy.backend.csproj", "{BC5BBC86-A0F3-4E76-8132-D53E8310FFDD}"
 EndProject
